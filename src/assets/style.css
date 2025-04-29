@@ -15,6 +15,7 @@
     --color2: #e3e0db;
     --color3: #dedede;
     --color4: #000;
+    --color5: #00000013;
     --uv0: #32e7e7;
     --uv1: #81e733;
     --uv2: #ff8f10;
@@ -42,7 +43,7 @@ body {
 button { cursor: pointer; }
 h1 { font-size: 2.2rem; }
 h2 { font-size: var(--h2); }
-h3 { font-size: 5.0rem; }
+h3 { font-size: 4.3rem; }
 h4 { font-size: 2.5rem; }
 .p1{ font-size: 1.9rem; }
 .p2{ font-size: 1.5rem; }
@@ -66,7 +67,11 @@ h4 { font-size: 2.5rem; }
 .wrap { flex-wrap: wrap; }
 .icon-lg { width: 70px; }
 .icon-md { width: 40px; }
-.icon-sm { width: 34px; }
+.icon-sm {
+    aspect-ratio: 1;
+    width: 34px;
+    max-width: 100%;
+}
 .relative { position: relative; }
 .marg-top { margin-top: var(--basic-pad); }
 .marg-left { margin-left: var(--basic-pad); }
@@ -137,7 +142,7 @@ h4 { font-size: 2.5rem; }
 .bar-frame {
     width: var(--bar-width);
     height: var(--bar-height);
-    background-color: var(--color2);
+    background-color: var(--color5);
     position: relative;
 }
 .bar-fill {
@@ -147,11 +152,14 @@ h4 { font-size: 2.5rem; }
     /* top: calc( 160px - var(--temp) ); */
     /*  */
 
-    top: 160px;
-    position: relative;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
     background-color: var(--color0);
     border: 1px solid var(--color4);
-    height: var(--temp);
+    height: 0;
+    transition: height 1.2s;
+    transition-timing-function: cubic-bezier(0.37, 0.19, 0, 1);
 }
 
 .box-hold {

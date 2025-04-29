@@ -1,4 +1,4 @@
-import dataLondon from "../dataLondon.json";
+import dataLondon from '../dataLondon.json';
 
 class Grabber {
 
@@ -26,8 +26,32 @@ class Grabber {
 };
 
 class Parser {
+
+    mod( n, m) { return ((n % m) + m) % m; };
+
     getDay( JSON, day ) { return JSON.days[ day ] };
+    getHour( JSON, hr ) { return JSON.hours[ hr ] };
+
+    // getDays( JSON ) { return JSON.days[ day ] };
     getCurrent( JSON ) { return JSON.currentConditions };
+    getCurrent_Hour( JSON ) {
+        const cc = JSON.currentConditions;
+        const time = cc.datetime.split( ':' ); 
+        let hr = parseInt( time[ 0 ] );
+        hr = parseInt( time[ 1 ] ) > 30 ? this.mod( hr + 1, 24 ) : hr;
+        return hr;
+    };
+    
+    // IT SHOULD BE 0 (AKA TODAY) UNLESS WE'RE SAMPLING AT 23:31:00
+    // WHICH WILL ROUND UP THE HOUR TO 00:00:00
+    // AND THE DAY SHOULD INCREASE
+    getCurrent_Day( JSON ) {
+        const cc = JSON.currentConditions;
+        const time = cc.datetime.split( ':' ); 
+        let min = parseInt( time[ 1 ] );
+        let day = min > 30 ? 1 : 0;
+        return day;
+    };
 
     getCity( JSON ) {
         const rawAddress = JSON.resolvedAddress;
@@ -38,11 +62,14 @@ class Parser {
         const address = `${addressArray[0]}, ${addressArray[1]}`;
         return address;
     };
-    currConditions( currJSON ) { return  currJSON.conditions; };
-    currTemp( currJSON ) { return Math.round( currJSON.temp ); };
-    currFeelsLike( currJSON ) { return Math.round( currJSON.feelslike ); };
-    currPrecip( currJSON ) { return Math.round( currJSON.precipprob ) + '%'; };
-    currUVIndex( currJSON ) { return Math.round( currJSON.uvindex ); };
+    getConditions( JSON ) { return  JSON.conditions; };
+    getTemp( JSON ) { return Math.round( JSON.temp ); };
+    getFeelsLike( JSON ) { return Math.round( JSON.feelslike ); };
+    getPrecip( JSON ) { return Math.round( JSON.precipprob ) + '%'; };
+    getUVIndex( JSON ) { return Math.round( JSON.uvindex ); };
+    getIcon( JSON ) { return JSON.icon; };
+
+    // getHour( JSON ) { return JSON.split(':')[0] };
 };
 
 export { Grabber, Parser };
