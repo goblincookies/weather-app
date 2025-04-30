@@ -34,6 +34,7 @@
 }
 body {
     background-color: var( --color1 );
+    width: 100vw;
 }
 .debugA { border: 2px solid red;}
 .debugB { border: 2px solid greenyellow;}
@@ -72,6 +73,7 @@ h4 { font-size: 2.5rem; }
     width: 34px;
     max-width: 100%;
 }
+.hide { visibility: hidden; }
 .relative { position: relative; }
 .marg-top { margin-top: var(--basic-pad); }
 .marg-left { margin-left: var(--basic-pad); }
@@ -81,6 +83,11 @@ h4 { font-size: 2.5rem; }
 .center-horiz{ margin: auto; }
 .display-height-calc{ height: calc(var(--h2) * var(--line-height)); }
 .bar-width { width: var(--bar-width); }
+.uv0 { filter: invert(97%) sepia(68%) saturate(7439%) hue-rotate(128deg) brightness(97%) contrast(87%); }
+.uv1 { filter: invert(82%) sepia(50%) saturate(688%) hue-rotate(37deg) brightness(96%) contrast(90%);}
+.uv2 { filter: invert(65%) sepia(32%) saturate(3961%) hue-rotate(350deg) brightness(101%) contrast(102%);}
+.uv3 { filter: invert(21%) sepia(78%) saturate(7469%) hue-rotate(346deg) brightness(104%) contrast(101%);}
+.uv4 { filter: invert(20%) sepia(71%) saturate(5451%) hue-rotate(307deg) brightness(105%) contrast(103%);}
 
 .basic-vert-padding{
     padding-top: var(--basic-pad);
@@ -146,12 +153,6 @@ h4 { font-size: 2.5rem; }
     position: relative;
 }
 .bar-fill {
-    /* CALCULATE THIS */
-    /* --raw: 94px; */
-    /* --temp: calc( var(--raw) + 30px ); */
-    /* top: calc( 160px - var(--temp) ); */
-    /*  */
-
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -166,12 +167,15 @@ h4 { font-size: 2.5rem; }
     width: 100%;
     aspect-ratio: 1;
 }
-
-.pan-wide {
+.pan {
+    /* transform: translateX(50px); */
+}
+.pan-box {
     /* CALCULATE THISSSS */
-    margin-left: 90px;
+    /* margin-left: 90px; */
     /*  */
-
+    
+    position: relative;
     width: 2000px;
     height: 100%;
 }
@@ -192,8 +196,8 @@ h4 { font-size: 2.5rem; }
 
 .cent {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -2%;
+    left: 0%;
     width:100%;
     height:100%;
     display: flex;
@@ -215,39 +219,25 @@ h4 { font-size: 2.5rem; }
 
 .gradient {
     z-index: -1;
-
     background: radial-gradient(circle,rgb(75, 182, 119) 0%, rgba(87, 199, 133, 1) 24%, var(--color1) 25%);
     filter: blur( 50px );
-
     transition: filter 1.5s;
     transition-timing-function: cubic-bezier(0.37, 0.19, 0, 1);
-    
     position: absolute;
-    /* left: 50%; */
-    /* top: 50%; */
-    
-    
-    /* background: linear-gradient(-45deg, #fdd266, #c33c7a, #595ba8); */
     background-size: 200% 200%;
     animation: sway 15s ease infinite;
     height: 100%;
     width: 100%;
-    /* height: 9rem; */
-    /* width:9rem; */
 }
 .blur {
     opacity: 0.4;
     filter: blur( 30px );
     transition: filter 1.5s, opacity .4s;
     transition-timing-function: cubic-bezier(0.37, 0.19, 0, 1);
-    /* transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1); */
-    /* transition: opacity 1s; */
 }
 .reveal{
     opacity: 1;
     filter: blur( 0px );
-    /* transition: opacity 1s; */
-    /* transition: filter 1s opacity 1s; */
 }
 
 

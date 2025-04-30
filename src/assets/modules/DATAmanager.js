@@ -27,11 +27,21 @@ class Grabber {
 
 class Parser {
 
+    DAY_OF_THE_WEEK = ['Sun', 'Mon', 'Tues', 'Wed', 'Thu', 'Fri', 'Sat'];
     mod( n, m) { return ((n % m) + m) % m; };
 
     getDay( JSON, day ) { return JSON.days[ day ] };
     getHour( JSON, hr ) { return JSON.hours[ hr ] };
-
+    getDate( JSON ) {
+        const cc = JSON.datetime;
+        const time = cc.split( '-' ); 
+        return `${ time[1] }/${ time[2] }`;
+    };
+    getDayOf( JSON ) {
+        const cc = JSON.datetime;
+        const date = new Date( cc );
+        return this.DAY_OF_THE_WEEK[ date.getDay() ];
+    };
     // getDays( JSON ) { return JSON.days[ day ] };
     getCurrent( JSON ) { return JSON.currentConditions };
     getCurrent_Hour( JSON ) {
@@ -64,6 +74,9 @@ class Parser {
     };
     getConditions( JSON ) { return  JSON.conditions; };
     getTemp( JSON ) { return Math.round( JSON.temp ); };
+    getTempHigh( JSON ) { return Math.round( JSON.tempmax ); };
+    getLow( JSON ) { return Math.round( JSON.tempmin ); };
+
     getFeelsLike( JSON ) { return Math.round( JSON.feelslike ); };
     getPrecip( JSON ) { return Math.round( JSON.precipprob ) + '%'; };
     getUVIndex( JSON ) { return Math.round( JSON.uvindex ); };

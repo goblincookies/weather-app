@@ -1,4 +1,4 @@
-import f_uvBadge from '../images/badge.svg';
+import f_uvBadge from '../images/badge-fill.svg';
 import f_clearDay from '../images/clear-day.svg';
 import f_clearNight from '../images/clear-night.svg';
 import f_cloudy from '../images/cloudy.svg';
@@ -43,6 +43,8 @@ class PageBuilder {
         'thunder':f_thunder, 'wind':f_wind
     };
 
+    UV_SCALE = [2,5,7,10];
+
     // HELPER FUNCTION
     createElement ( type, classes, src) {
         let element = document.createElement( type );
@@ -52,6 +54,104 @@ class PageBuilder {
         };
         if (src) { element.src = src; }
         return element;
+    };
+
+    getCSS_Filter( num ) {
+        num = Math.max( num, 0 );
+
+        let i = 0;
+        this.UV_SCALE.forEach( rating => {
+            if( num <= rating ) { return 'uv'+ i; }
+            i += 1;
+        });
+
+        return 'uv'+ i;
+    }
+
+    getHTML_TenDayButton( day, date_data ) {
+        // <li class="">
+        //     <button class="pill flex-v gap-sm selected">
+        //         <div class="flex-v">
+        //             <p class="p2 bold">186</p>
+        //             <p class="p2">67</p>
+        //         </div>
+                
+        //         <div class=" wide flex-center relative">
+        //             <img class=" icon-md" src="./assets/images/badge.svg" alt="">
+        //             <p class="cent">14</p>
+        //         </div>
+
+                
+        //         <div class=" wide">
+        //             <img class="icon-lg" src="./assets/images/sunny.svg" alt="">
+        //         </div>
+        //         <div class="percip">
+        //             <p>75%</p>
+        //         </div>
+        //         <div class="date">
+        //             <p class="bold">Today</p>
+        //             <p>4/24</p>
+        //         </div>
+
+        //     </button>
+        // </li>
+
+        const mainLi = this.createElement( 'li', '');
+        const mainButton = this.createElement( 'button', 'pill flex-v gap-sm');
+        const hiLoDiv = this.createElement( 'div', 'flex-v' );
+        const hiP = this.createElement( 'p', 'p2 bold' );
+        const loP = this.createElement( 'p', 'p2' );
+        const uvDiv = this.createElement( 'div', 'wide flex-center relative' );
+        const uvImg = this.createElement( 'img', 'icon-md', f_uvBadge );
+        const uvP = this.createElement( 'p', 'cent' );
+        const iconDiv = this.createElement( 'div', 'wide' );
+        const iconImg = this.createElement( 'img', 'icon-lg', this.ICONS_ALL[ date_data.icon ] );
+        const rainDiv = this.createElement( 'div', 'precip' );
+        const rainP = this.createElement( 'p', '' );
+        const dateDiv = this.createElement( 'div', 'date' );
+        const dayOfP = this.createElement( 'p', 'bold' );
+        const dateP = this.createElement( 'p', '' );
+
+        mainLi.id = `day-${ day }`;
+
+        hiP.textContent = date_data.temp_high;
+        loP.textContent = date_data.temp_low;
+        
+        rainP.textContent = date_data.precip;
+        dayOfP.textContent = date_data.day_of;
+        dateP.textContent = date_data.date;
+
+
+        if ( date_data.uvindex > 0 ) {
+            uvP.textContent = date_data.uvindex;
+            uvImg.classList.add( this.getCSS_Filter( date_data.uvindex ) );
+        } else {
+            uvImg.classList.add( 'hide' );
+        }
+
+
+        hiLoDiv.appendChild( hiP );
+        hiLoDiv.appendChild( loP );
+        
+        uvDiv.appendChild( uvImg );
+        uvDiv.appendChild( uvP );
+
+        iconDiv.appendChild( iconImg );
+
+        rainDiv.appendChild( rainP );
+
+        dateDiv.appendChild( dayOfP );
+        dateDiv.appendChild( dateP );
+
+        mainButton.appendChild( hiLoDiv );
+        mainButton.appendChild( uvDiv );
+        mainButton.appendChild( iconDiv );
+        mainButton.appendChild( rainDiv );
+        mainButton.appendChild( dateDiv );
+
+        mainLi.appendChild( mainButton );
+
+        return( mainLi );
     };
 
     getHTML_Bar( n, hr_data ) {
@@ -96,8 +196,19 @@ class PageBuilder {
         mainLi.id = `bar-${ n }`;
         hrP.textContent = hr_data.hr;
         tempP.textContent = hr_data.temp;
-        uvP.textContent = hr_data.uvindex;
-        rainP.textContent = hr_data.precip;
+        
+        
+        if ( hr_data.uvindex > 0 ) {
+            uvP.textContent = hr_data.uvindex;
+            uvImg.classList.add( this.getCSS_Filter( hr_data.uvindex ) );
+        } else {
+            uvImg.classList.add( 'hide' );
+        }
+
+
+        let precip = hr_data.precip.split( '%' )[ 0 ];
+        precip = parseInt( precip );
+        if ( precip > 0 ) { rainP.textContent = hr_data.precip; }
 
         // barFillDiv.style.height = hr_data.height + 'px';
 
@@ -132,9 +243,7 @@ class PageModifier {
     ID_UVINDEX = 'uvindex';
     ID_CURRENTCONDITIONS = 'current-conditions';
     ID_FORECASTHOURLY = 'forecast-hourly';
-
-
-
+    ID_HOURLYCHART = 'hourly-chart';
 
     get GRADIENT() { return document.querySelector( 'div.gradient' ); }
 
@@ -147,6 +256,7 @@ class PageModifier {
     get FEELSLIKE() { return document.getElementById( this.ID_FEELSLIKE ); }
     get PRECIP() { return document.getElementById( this.ID_PRECIP ); }
     get UVINDEX() { return document.getElementById( this.ID_UVINDEX ); }
+    get HOURLYCHART() { return document.getElementById( 'hourly-chart' ); }
     // get TEMP() { return document.getElementById( this.ID_TEMP ); }
 
     write( HTML, data ) { HTML.textContent = data; };
