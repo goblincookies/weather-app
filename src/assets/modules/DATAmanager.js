@@ -1,4 +1,4 @@
-import dataLondon from '../dataLondon.json';
+import dataLondon from '../dataNewYork.json';
 
 class Grabber {
 

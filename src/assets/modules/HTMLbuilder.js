@@ -66,7 +66,18 @@ class PageBuilder {
         });
 
         return 'uv'+ i;
-    }
+    };
+
+    removeButtonSelect( id ) {
+        const HTML = document.getElementById( `day-${ id }`);
+        HTML.querySelector( 'button' ).classList.remove( 'selected' );
+    };
+
+    addButtonSelect( id ) {
+        const HTML = document.getElementById( `day-${ id }`);
+        HTML.querySelector( 'button' ).classList.add( 'selected' );
+    };
+
 
     getHTML_TenDayButton( day, date_data ) {
         // <li class="">

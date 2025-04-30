@@ -10552,7 +10552,7 @@
         }
     },
     "currentConditions": {
-        "datetime": "13:10:00",
+        "datetime": "08:10:00",
         "datetimeEpoch": 1745601000,
         "temp": 84.0,
         "feelslike": 85.1,

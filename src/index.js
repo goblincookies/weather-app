@@ -1,6 +1,7 @@
 import './assets/style.css';
 import { Grabber, Parser } from './assets/modules/DATAmanager';
 import { PageBuilder, PageModifier } from './assets/modules/HTMLbuilder';
+import { Interactions } from './assets/modules/ACTIONmanager';
 
 console.log('hello world!');
 
@@ -9,6 +10,8 @@ const grabber = new Grabber( true )
 const parser = new Parser();
 const pageModifier = new PageModifier();
 const pageBuilder = new PageBuilder();
+
+
 const chartHeight = 160;
 const barshift = 60;
 let displayDay = 0;
@@ -16,6 +19,16 @@ let displayDay = 0;
 async function setup() {
 
     resize();
+
+    document.querySelectorAll( '.pan' ).forEach( ( html ) => {
+        new Interactions( html );
+    });
+
+
+
+    // item.addEventListener("mousedown", dragStart);
+    // item.addEventListener("touchstart", dragStart);
+
     // CLEAR PAGE!
     blurWholePage();
     console.log( `requesting data` );
@@ -23,6 +36,7 @@ async function setup() {
     loadPage( data );
     const inpt = document.querySelector('input.search');
     inpt.addEventListener('focus', searchFocus );
+
 };
 
 function resize() {
@@ -65,7 +79,6 @@ function searchBlur( e ) {
 
 function transition(){
     console.log( `transitioning` );
-
 };
 
 function blurWholePage(){
@@ -98,15 +111,24 @@ function updatePageInfo( data ) {
 
 function changeDisplay( e ) {
 
-    transition();
-
     let li = e.currentTarget.closest( 'li' );
-    console.log( li );
-    console.log( `switching to ${ li.id }, current page ${displayDay}`);
-    displayDay = li.id.split("-")[ 1 ];
+    let id = li.id.split("-")[ 1 ];
+
+    
+    if ( id != displayDay ) {
+        transition();
+        pageBuilder.removeButtonSelect( displayDay );
+        pageBuilder.addButtonSelect( id );
+
+        console.log( li );
+        console.log( `switching to ${ id }, current page ${ displayDay }`);
+        displayDay = id;
+    }
+
 };
 
 async function updateHourlyChart( data ) {
+
     console.log( `updating hourly chart` );
     let hour = parser.getCurrent_Hour( data );
     let day = parser.getCurrent_Day( data );
@@ -121,13 +143,16 @@ async function updateHourlyChart( data ) {
     const chartUl = pageModifier.HOURLYCHART; //document.getElementById( 'hourly-chart' );
     chartUl.textContent = '';
 
-    for ( let bar = 0; bar < 10; bar ++ ) {
+
+
+    // for ( let bar = 0; bar < 7; bar ++ ) {
+    for ( let bar = 0; bar + hour < 24; bar ++ ) {
         hr_data.hr = bar + hour;
-        if ( hr_data.hr >= 24 ) {
-            day += 1;
-            hour = -bar;
-            hr_data.hr = 0;
-        };
+        // if ( hr_data.hr >= 24 ) {
+        //     day += 1;
+        //     hour = -bar;
+        //     hr_data.hr = 0;
+        // };
         hrJSON = parser.getHour( dayJSON, hr_data.hr );
 
         hr_data.temp = parser.getTemp( hrJSON );
@@ -165,7 +190,6 @@ function updateTenDay( data ) {
     for ( let day = 0; day < 10; day ++ ) {
         dayJSON = parser.getDay( data, day );
 
-
         date_data.temp_high = parser.getTempHigh( dayJSON );
         date_data.temp_low = parser.getLow( dayJSON );
         date_data.uvindex = parser.getUVIndex( dayJSON );
@@ -174,9 +198,10 @@ function updateTenDay( data ) {
         date_data.day_of = parser.getDayOf( dayJSON );
         date_data.date = parser.getDate( dayJSON );
 
-        if( day < 1 ){ date_data.day_of = 'Today' };
-
+        if( day < 1 ){ date_data.day_of = 'Today'; };
         let HTML = pageBuilder.getHTML_TenDayButton( day, date_data );
+        if( day < 1 ){ HTML.querySelector( 'button' ).classList.add( 'selected' ); };
+
         tenDayUL.appendChild( HTML );
         HTML.querySelector( 'button' ).addEventListener( 'click', changeDisplay );
     };
