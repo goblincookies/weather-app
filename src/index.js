@@ -10,6 +10,9 @@ const grabber = new Grabber( true )
 const parser = new Parser();
 const pageModifier = new PageModifier();
 const pageBuilder = new PageBuilder();
+// const interactions = new Interactions();
+const interactionChart = new Interactions();
+const interactionTenDay = new Interactions();
 
 
 const chartHeight = 160;
@@ -18,16 +21,22 @@ let displayDay = 0;
 
 async function setup() {
 
-    resize();
+    // resize();
 
-    document.querySelectorAll( '.pan' ).forEach( ( html ) => {
-        new Interactions( html );
-    });
+    // document.querySelectorAll( '.pan' ).forEach( ( html ) => {
+    //     console.log( 'setting up drag interactions' );
+    //     console.log( html );
+    //     new Interactions( html );
+    // });
+    // interactions.addWatch( pageModifier.HOURLYCHART );
+    // interactions.addWatch( pageModifier.TENDAY );
 
+    interactionChart.watch( pageModifier.HOURLYCHART )
+    interactionTenDay.watch( pageModifier.TENDAY )
+    // new Interactions( pageModifier.HOURLYCHART );
+    // new Interactions( pageModifier.TENDAY );
 
-
-    // item.addEventListener("mousedown", dragStart);
-    // item.addEventListener("touchstart", dragStart);
+    console.log( pageModifier.TENDAY );
 
     // CLEAR PAGE!
     blurWholePage();
@@ -39,21 +48,21 @@ async function setup() {
 
 };
 
-function resize() {
-    const upperDiv = document.querySelector( 'div.upper' );
-    const tenDay = document.getElementById( 'ten-day' );
+// function resize() {
+//     const upperDiv = document.querySelector( 'div.upper' );
+//     const tenDay = document.getElementById( 'ten-day' );
 
-    const upperStyle = getComputedStyle(upperDiv);
-    const left = parseInt( upperStyle.marginLeft ) + parseInt( upperStyle.paddingLeft );
+//     const upperStyle = getComputedStyle(upperDiv);
+//     const left = parseInt( upperStyle.marginLeft ) + parseInt( upperStyle.paddingLeft );
 
-    // CENTER IT IF YOU CAN
-    // DISABLE PANNING IF IT'S ENTIRELY VISIBLE
-    tenDay.style.transform = `translateX( ${ left }px)`;
-}
+//     // CENTER IT IF YOU CAN
+//     // DISABLE PANNING IF IT'S ENTIRELY VISIBLE
+//     tenDay.style.transform = `translateX( ${ left }px)`;
+// }
 
 function loadPage( data ) {
     updatePageInfo( data );
-    updateHourlyChart( data );
+    updateHourlyChart( data, 0 );
     updateTenDay( data );
 };
 
@@ -77,22 +86,31 @@ function searchBlur( e ) {
     unblurWholePage();
 };
 
-function transition(){
-    console.log( `transitioning` );
-};
-
-function blurWholePage(){
+function blurChart() {
     pageModifier.unblur( pageModifier.GRADIENT );
     pageModifier.blur( pageModifier.CURRENTCONDITIONS );
     pageModifier.blur( pageModifier.FORECASTHOURLY );
-    // pageModifier.blur( pageModifier.FORECAS );
+};
 
-}
-
-function unblurWholePage(){
+function unblurChart() {
     pageModifier.blur( pageModifier.GRADIENT );
     pageModifier.unblur( pageModifier.CURRENTCONDITIONS );
     pageModifier.unblur( pageModifier.FORECASTHOURLY );
+};
+
+function blurWholePage() {
+    pageModifier.unblur( pageModifier.GRADIENT );
+    pageModifier.blur( pageModifier.CURRENTCONDITIONS );
+    pageModifier.blur( pageModifier.FORECASTHOURLY );
+    pageModifier.blur( pageModifier.FORECASTTENDAY );
+    // pageModifier.blur( pageModifier.FORECAS );
+}
+
+function unblurWholePage() {
+    pageModifier.blur( pageModifier.GRADIENT );
+    pageModifier.unblur( pageModifier.CURRENTCONDITIONS );
+    pageModifier.unblur( pageModifier.FORECASTHOURLY );
+    pageModifier.unblur( pageModifier.FORECASTTENDAY );
 }
 
 function updatePageInfo( data ) {
@@ -109,29 +127,41 @@ function updatePageInfo( data ) {
     unblurWholePage();
 };
 
-function changeDisplay( e ) {
+async function changeDisplay( e ) {
 
     let li = e.currentTarget.closest( 'li' );
     let id = li.id.split("-")[ 1 ];
 
     
     if ( id != displayDay ) {
-        transition();
+        // transition();
+
+        
+
         pageBuilder.removeButtonSelect( displayDay );
         pageBuilder.addButtonSelect( id );
 
         console.log( li );
         console.log( `switching to ${ id }, current page ${ displayDay }`);
         displayDay = id;
-    }
+
+        blurChart();
+        await new Promise( ( resolve, reject ) => setTimeout( resolve, 800 ) );
+        updateHourlyChart( grabber.fetchedData, id );
+        unblurChart();
+        
+    };
 
 };
 
-async function updateHourlyChart( data ) {
+async function updateHourlyChart( data, day ) {
 
     console.log( `updating hourly chart` );
-    let hour = parser.getCurrent_Hour( data );
-    let day = parser.getCurrent_Day( data );
+
+    let hour = day < 1 ? parser.getCurrent_Hour( data ): 0 ;
+
+    // day = day < 1 ? parser.getCurrent_Day( data ) : day;
+    // let day = parser.getCurrent_Day( data );
     console.log( `current Hour: ${hour}` );
     console.log( `current Day: ${day}` );
 
@@ -141,9 +171,10 @@ async function updateHourlyChart( data ) {
 
     // MOVE TO PAGE MOD
     const chartUl = pageModifier.HOURLYCHART; //document.getElementById( 'hourly-chart' );
+    interactionChart.reset( chartUl );
+    // pageModifier.clearTransform( chartUl );
+
     chartUl.textContent = '';
-
-
 
     // for ( let bar = 0; bar < 7; bar ++ ) {
     for ( let bar = 0; bar + hour < 24; bar ++ ) {
@@ -160,14 +191,15 @@ async function updateHourlyChart( data ) {
         hr_data.icon = parser.getIcon( hrJSON );
         hr_data.precip = parser.getPrecip( hrJSON );
         hr_data.height = tempToBarHeight( hr_data.temp );
-        hr_data.hr = ( bar < 1 ) ? 'NOW' : `${ hr_data.hr}:00`;
+
+        hr_data.hr = ( bar < 1 && day < 1 ) ? 'NOW' : `${ hr_data.hr}:00`;
 
         let HTML = pageBuilder.getHTML_Bar( `bar`, hr_data );
         chartUl.appendChild( HTML );
     };
 
     // DELAYED CHART DRAW
-    await new Promise( ( resolve, reject ) => setTimeout( resolve, 1000 ) );        
+    await new Promise( ( resolve, reject ) => setTimeout( resolve, 800 ) );
     let n = 0;
     console.log('adding height');
     Array.from( chartUl.children ).forEach( li => {
@@ -177,6 +209,8 @@ async function updateHourlyChart( data ) {
         bar.style.transitionDelay = `${n * 0.06}s`;
         n+=1;
     });
+
+    // interactionChart = new Interactions( chartUl );
 };
 
 function updateTenDay( data ) {
@@ -205,6 +239,8 @@ function updateTenDay( data ) {
         tenDayUL.appendChild( HTML );
         HTML.querySelector( 'button' ).addEventListener( 'click', changeDisplay );
     };
+
+    // interactionTenDay = new Interactions( tenDayUL );
 };
 
 setup();

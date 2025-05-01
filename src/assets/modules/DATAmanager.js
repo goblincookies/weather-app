@@ -1,8 +1,9 @@
-import dataLondon from '../dataNewYork.json';
+import downloadedData from '../dataNewYork.json';
 
 class Grabber {
 
     useDebug = true;
+    data;
 
     constructor( debug ){
         this.useDebug = debug;
@@ -16,12 +17,14 @@ class Grabber {
         console.log( `getting data` );
         // let data = {};
 
-        let data = dataLondon;
+        this.data = downloadedData;
         await new Promise( ( resolve, reject ) => setTimeout( resolve, 2000 ) );        
         console.log( 'debug time!' );
         
-        return data;
+        return this.data;
     };
+
+    get fetchedData() { return this.data };
 
 };
 
@@ -55,13 +58,13 @@ class Parser {
     // IT SHOULD BE 0 (AKA TODAY) UNLESS WE'RE SAMPLING AT 23:31:00
     // WHICH WILL ROUND UP THE HOUR TO 00:00:00
     // AND THE DAY SHOULD INCREASE
-    getCurrent_Day( JSON ) {
-        const cc = JSON.currentConditions;
-        const time = cc.datetime.split( ':' ); 
-        let min = parseInt( time[ 1 ] );
-        let day = min > 30 ? 1 : 0;
-        return day;
-    };
+    // getCurrent_Day( JSON ) {
+    //     const cc = JSON.currentConditions;
+    //     const time = cc.datetime.split( ':' ); 
+    //     let min = parseInt( time[ 1 ] );
+    //     let day = min > 30 ? 1 : 0;
+    //     return day;
+    // };
 
     getCity( JSON ) {
         const rawAddress = JSON.resolvedAddress;

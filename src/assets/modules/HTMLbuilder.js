@@ -107,16 +107,16 @@ class PageBuilder {
         //     </button>
         // </li>
 
-        const mainLi = this.createElement( 'li', '');
+        const mainLi = this.createElement( 'li', 'non');
         const mainButton = this.createElement( 'button', 'pill flex-v gap-sm');
         const hiLoDiv = this.createElement( 'div', 'flex-v' );
         const hiP = this.createElement( 'p', 'p2 bold' );
         const loP = this.createElement( 'p', 'p2' );
         const uvDiv = this.createElement( 'div', 'wide flex-center relative' );
-        const uvImg = this.createElement( 'img', 'icon-md', f_uvBadge );
+        const uvImg = this.createElement( 'img', 'icon-md non', f_uvBadge );
         const uvP = this.createElement( 'p', 'cent' );
         const iconDiv = this.createElement( 'div', 'wide' );
-        const iconImg = this.createElement( 'img', 'icon-lg', this.ICONS_ALL[ date_data.icon ] );
+        const iconImg = this.createElement( 'img', 'icon-lg non', this.ICONS_ALL[ date_data.icon ] );
         const rainDiv = this.createElement( 'div', 'precip' );
         const rainP = this.createElement( 'p', '' );
         const dateDiv = this.createElement( 'div', 'date' );
@@ -186,7 +186,7 @@ class PageBuilder {
         //     </div>
         // </li>
 
-        const mainLi = this.createElement( 'li', 'flex-v' );
+        const mainLi = this.createElement( 'li', 'flex-v non' );
         const topDiv = this.createElement( 'div', 'marg-top-sm flex-v' );
         const hrP = this.createElement( 'p', 'p4 light' );
         const barBackDiv = this.createElement( 'div', 'bar-frame' );
@@ -194,14 +194,14 @@ class PageBuilder {
         const tempP = this.createElement( 'p', 'p4 bold temp' );
 
         const uvDiv = this.createElement( 'div', 'box-hold wide flex-center relative' );
-        const uvImg = this.createElement( 'img', 'wide icon-sm', f_uvBadge );
+        const uvImg = this.createElement( 'img', 'wide icon-sm non', f_uvBadge );
         const uvP = this.createElement( 'p', 'cent' );
 
         const iconDiv = this.createElement( 'div' , 'box-hold icon flex-center' );
         console.log( `looking for icon: ${ hr_data.icon }` );
-        const iconImg = this.createElement( 'img', 'icon-sm', this.ICONS_ALL[ hr_data.icon ] );
+        const iconImg = this.createElement( 'img', 'icon-sm non', this.ICONS_ALL[ hr_data.icon ] );
 
-        const rainDiv = this.createElement( 'div', 'rain' );
+        const rainDiv = this.createElement( 'div', 'rain box-hold' );
         const rainP = this.createElement( 'p', 'p4' );
 
         mainLi.id = `bar-${ n }`;
@@ -254,12 +254,17 @@ class PageModifier {
     ID_UVINDEX = 'uvindex';
     ID_CURRENTCONDITIONS = 'current-conditions';
     ID_FORECASTHOURLY = 'forecast-hourly';
+    ID_FORECASTTENDAY = 'forecast-ten-day';
+
     ID_HOURLYCHART = 'hourly-chart';
+    ID_TENDAY = 'ten-day';
+
 
     get GRADIENT() { return document.querySelector( 'div.gradient' ); }
 
     get CURRENTCONDITIONS() { return document.getElementById( this.ID_CURRENTCONDITIONS ); }
     get FORECASTHOURLY() { return document.getElementById( this.ID_FORECASTHOURLY ); }
+    get FORECASTTENDAY() { return document.getElementById( this.ID_FORECASTTENDAY ); }
 
     get CITY() { return document.getElementById( this.ID_CITY ); }
     get CONDITIONS() { return document.getElementById( this.ID_CONDITIONS ); }
@@ -267,12 +272,15 @@ class PageModifier {
     get FEELSLIKE() { return document.getElementById( this.ID_FEELSLIKE ); }
     get PRECIP() { return document.getElementById( this.ID_PRECIP ); }
     get UVINDEX() { return document.getElementById( this.ID_UVINDEX ); }
-    get HOURLYCHART() { return document.getElementById( 'hourly-chart' ); }
+    get HOURLYCHART() { return document.getElementById( this.ID_HOURLYCHART ); }
+    get TENDAY() { return document.getElementById( this.ID_TENDAY ); }
+
     // get TEMP() { return document.getElementById( this.ID_TEMP ); }
 
     write( HTML, data ) { HTML.textContent = data; };
     unblur( HTML ) { HTML.classList.add( 'reveal' ); };
     blur( HTML ) { HTML.classList.remove( 'reveal' ); };
+    // clearTransform( HTML ) { HTML.style.transform = null; };
 
 }
 
