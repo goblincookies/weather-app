@@ -1,0 +1,40 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /> 
+  <title>Datalist</title>
+  <script src="dropdown.js" defer></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <fieldset>
+    <legend> Datalist Form </legend>
+    <label>Select Browser</label>
+    <input  autocomplete="off" role="combobox" list="" id="input" name="browsers" placeholder="Select your fav browser">
+  <!-- Its important that you keep list attribute empty to hide the default dropdown icon and the browser's default datalist -->
+
+  <datalist id="browsers" role="listbox">
+    <option value="Internet Explorer">Internet Explorer</option>
+    <option value="Chrome">Chrome</option>
+    <option value="Safari">Safari</option>
+    <option value="Microsoft Edge">Microsoft Edge</option>
+    
+    <option value="Firefox">Firefox</option><option value="Microsoft Edge">Microsoft Edge</option>
+    <option value="Firefox">Firefox</option><option value="Microsoft Edge">Microsoft Edge</option>
+    <option value="Firefox">Firefox</option><option value="Microsoft Edge">Microsoft Edge</option>
+    <option value="Firefox">Firefox</option><option value="Microsoft Edge">Microsoft Edge</option>
+    <option value="Firefox">Firefox</option><option value="Microsoft Edge">Microsoft Edge</option>
+    <option value="Firefox">Firefox</option><option value="Microsoft Edge">Microsoft Edge</option>
+    <option value="Firefox">Firefox</option><option value="Microsoft Edge">Microsoft Edge</option>
+    <option value="Firefox">Firefox</option><option value="Microsoft Edge">Microsoft Edge</option>
+    <option value="Firefox">Firefox</option><option value="Microsoft Edge">Microsoft Edge</option>
+    <option value="Firefox">Firefox</option>
+  </datalist>
+  <div><h1>hello there!</h1></div>
+<!--     <br>
+    <br>
+    <label for="pwd"> Password </label>
+    <input id="pwd" type="password">
+     -->
+  </fieldset>
+</body>
+</html> 

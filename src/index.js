@@ -2,8 +2,8 @@ import './assets/style.css';
 import { Grabber, Parser } from './assets/modules/DATAmanager';
 import { PageBuilder, PageModifier } from './assets/modules/HTMLbuilder';
 import { Interactions } from './assets/modules/ACTIONmanager';
+import { AutoComplete } from './assets/modules/Autocomplete';
 
-console.log('hello world!');
 
 
 const grabber = new Grabber( true )
@@ -13,6 +13,7 @@ const pageBuilder = new PageBuilder();
 // const interactions = new Interactions();
 const interactionChart = new Interactions();
 const interactionTenDay = new Interactions();
+const autoComplete = new AutoComplete();
 
 
 const chartHeight = 160;
@@ -33,10 +34,11 @@ async function setup() {
 
     interactionChart.watch( pageModifier.HOURLYCHART )
     interactionTenDay.watch( pageModifier.TENDAY )
+    autoComplete.watch( pageModifier.SEARCH );
     // new Interactions( pageModifier.HOURLYCHART );
     // new Interactions( pageModifier.TENDAY );
 
-    console.log( pageModifier.TENDAY );
+    // console.log( pageModifier.TENDAY );
 
     // CLEAR PAGE!
     blurWholePage();
@@ -62,6 +64,7 @@ async function setup() {
 
 function loadPage( data ) {
     updatePageInfo( data );
+    updateSummary( data, 0 );
     updateHourlyChart( data, 0 );
     updateTenDay( data );
 };
@@ -80,6 +83,13 @@ function tempToBarHeight( t ) {
 function searchFocus( e ) {
     blurWholePage();
     e.currentTarget.addEventListener( 'blur', searchBlur );
+    console.log( 'id directly?' );
+
+    let name = e.currentTarget.name;
+    // const datalist = document.getElementById( name );
+    // console.log( 'id directly?' );
+
+    // datalist.style.display = 'block';
 };
 
 function searchBlur( e ) {
@@ -114,17 +124,22 @@ function unblurWholePage() {
 }
 
 function updatePageInfo( data ) {
-    console.log( 'updating page info' );
     const currJSON = parser.getCurrent( data );
     pageModifier.write( pageModifier.CITY, parser.getCity( data ) );
 
-    pageModifier.write( pageModifier.CONDITIONS, parser.getConditions( currJSON ) );
-    pageModifier.write( pageModifier.TEMP, parser.getTemp( currJSON ) );
-    pageModifier.write( pageModifier.FEELSLIKE, parser.getFeelsLike( currJSON ) );
-    pageModifier.write( pageModifier.PRECIP, parser.getPrecip( currJSON ) );
-    pageModifier.write( pageModifier.UVINDEX, parser.getUVIndex( currJSON ) );
-
     unblurWholePage();
+};
+
+function updateSummary( data, day ){
+
+    let JSON = day < 1 ? parser.getCurrent( data ) : parser.getDay( data, day );
+
+    pageModifier.write( pageModifier.CONDITIONS, parser.getConditions( JSON ) );
+    pageModifier.write( pageModifier.TEMP, parser.getTemp( JSON ) );
+    pageModifier.write( pageModifier.FEELSLIKE, parser.getFeelsLike( JSON ) );
+    pageModifier.write( pageModifier.PRECIP, parser.getPrecip( JSON ) );
+    pageModifier.write( pageModifier.UVINDEX, parser.getUVIndex( JSON ) );
+
 };
 
 async function changeDisplay( e ) {
@@ -137,16 +152,16 @@ async function changeDisplay( e ) {
         // transition();
 
         
-
         pageBuilder.removeButtonSelect( displayDay );
         pageBuilder.addButtonSelect( id );
 
-        console.log( li );
+        // console.log( li );
         console.log( `switching to ${ id }, current page ${ displayDay }`);
         displayDay = id;
 
         blurChart();
         await new Promise( ( resolve, reject ) => setTimeout( resolve, 800 ) );
+        updateSummary( grabber.fetchedData, id );
         updateHourlyChart( grabber.fetchedData, id );
         unblurChart();
         
@@ -156,14 +171,14 @@ async function changeDisplay( e ) {
 
 async function updateHourlyChart( data, day ) {
 
-    console.log( `updating hourly chart` );
+    // console.log( `updating hourly chart` );
 
     let hour = day < 1 ? parser.getCurrent_Hour( data ): 0 ;
 
     // day = day < 1 ? parser.getCurrent_Day( data ) : day;
     // let day = parser.getCurrent_Day( data );
-    console.log( `current Hour: ${hour}` );
-    console.log( `current Day: ${day}` );
+    // console.log( `current Hour: ${hour}` );
+    // console.log( `current Day: ${day}` );
 
     let dayJSON = parser.getDay( data, day );
     let hrJSON;
@@ -172,20 +187,13 @@ async function updateHourlyChart( data, day ) {
     // MOVE TO PAGE MOD
     const chartUl = pageModifier.HOURLYCHART; //document.getElementById( 'hourly-chart' );
     interactionChart.reset( chartUl );
-    // pageModifier.clearTransform( chartUl );
+
 
     chartUl.textContent = '';
 
-    // for ( let bar = 0; bar < 7; bar ++ ) {
     for ( let bar = 0; bar + hour < 24; bar ++ ) {
         hr_data.hr = bar + hour;
-        // if ( hr_data.hr >= 24 ) {
-        //     day += 1;
-        //     hour = -bar;
-        //     hr_data.hr = 0;
-        // };
         hrJSON = parser.getHour( dayJSON, hr_data.hr );
-
         hr_data.temp = parser.getTemp( hrJSON );
         hr_data.uvindex = parser.getUVIndex( hrJSON );
         hr_data.icon = parser.getIcon( hrJSON );
@@ -201,7 +209,7 @@ async function updateHourlyChart( data, day ) {
     // DELAYED CHART DRAW
     await new Promise( ( resolve, reject ) => setTimeout( resolve, 800 ) );
     let n = 0;
-    console.log('adding height');
+    // console.log('adding height');
     Array.from( chartUl.children ).forEach( li => {
         const t = li.querySelector( 'p.temp' ).textContent;
         const bar = li.querySelector( 'div.bar-fill' );

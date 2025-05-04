@@ -31,6 +31,8 @@
     --line-height:0.8;
     --bar-width: 45px;
     --bar-height:160px;
+    --ten-width:100px;
+    --search-width: max(300px, 50%);
 }
 body {
     background-color: var( --color1 );
@@ -42,9 +44,9 @@ body {
 .debugE { background-color: red;}
 
 button { cursor: pointer; }
-h1 { font-size: 2.2rem; }
+h1 { font-size: 2rem; }
 h2 { font-size: var(--h2); }
-h3 { font-size: 4.3rem; }
+h3 { font-size: 3rem; }
 h4 { font-size: 2.5rem; }
 .p1{ font-size: 1.9rem; }
 .p2{ font-size: 1.5rem; }
@@ -61,7 +63,9 @@ h4 { font-size: 2.5rem; }
 .time { height: 2rem; }
 .min-height { height: min-content; }
 .fix-height { height: 60px; }
-.wide {width: 100%;}
+.wide { width: 100%; }
+.ten-width { width: var(--ten-width ); }
+.search-width { width: var(--search-width ); }
 .height-60 { height: 60vh;}
 .gap { gap: 1.5rem; }
 .gap-sm{ gap: 0.6rem;}
@@ -184,7 +188,6 @@ h4 { font-size: 2.5rem; }
 }
 
 .pill {
-    width: 100px;
     padding: 0.8rem;
     background-color: var(--color1);
     border: 1px solid var(--color4);
@@ -251,9 +254,43 @@ h4 { font-size: 2.5rem; }
     -webkit-user-select: none;
     -ms-user-select: none;
 }
-/* .test-slide {
-    transform: translateX( -165px );
-} */
+
+.autocomplete {
+    position: relative;
+    display: inline-block;
+}
+
+.autocomplete-items {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    /*position the autocomplete items to be the same width as the container:*/
+    top: 100%;
+    left: 0;
+    right: 0;
+}
+
+.autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff; 
+    border-bottom: 1px solid #d4d4d4; 
+}
+
+.item {
+    color: blue;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.autocomplete-active{
+    background-color: red !important;
+}
+.item:hover{
+    background-color: lightblue;
+}
 
 @keyframes sway {
     0% {

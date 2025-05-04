@@ -78,6 +78,31 @@ class PageBuilder {
         HTML.querySelector( 'button' ).classList.add( 'selected' );
     };
 
+    getHTML_Item( bold, text ) {
+        const mainDiv = this.createElement( 'div', 'item' );
+        const mainInput = this.createElement( 'input', '' );
+        if( bold.length > 0 ) {
+            const textStrong = this.createElement( 'strong', '' );
+            textStrong.textContent = bold;
+            mainDiv.appendChild( textStrong );
+        }
+        mainDiv.innerHTML += text;
+        mainInput.type = 'hidden';
+        mainInput.value = bold + text;
+
+        mainDiv.appendChild( mainInput );
+
+        // b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+        return mainDiv;
+    };
+
+    // getHTML_Option( text ){
+    //     // <option value="London">London</option>
+    //     const mainOption = this.createElement( 'option', '' );
+    //     mainOption.textContent = text;
+    //     mainOption.value = text;
+    //     return mainOption;
+    // };
 
     getHTML_TenDayButton( day, date_data ) {
         // <li class="">
@@ -108,7 +133,7 @@ class PageBuilder {
         // </li>
 
         const mainLi = this.createElement( 'li', 'non');
-        const mainButton = this.createElement( 'button', 'pill flex-v gap-sm');
+        const mainButton = this.createElement( 'button', 'pill flex-v gap-sm ten-width');
         const hiLoDiv = this.createElement( 'div', 'flex-v' );
         const hiP = this.createElement( 'p', 'p2 bold' );
         const loP = this.createElement( 'p', 'p2' );
@@ -258,9 +283,12 @@ class PageModifier {
 
     ID_HOURLYCHART = 'hourly-chart';
     ID_TENDAY = 'ten-day';
+    ID_GRADIENT = 'div.gradient';
+    ID_SEARCH = 'input.search';
 
-
-    get GRADIENT() { return document.querySelector( 'div.gradient' ); }
+    // get GRADIENT() { return document.querySelector( this.ID_GRADIENT ); }
+    get GRADIENT() { return this.getHTML_QS( this.ID_GRADIENT ); }
+    get SEARCH() { return this.getHTML_QS( this.ID_SEARCH ); }
 
     get CURRENTCONDITIONS() { return document.getElementById( this.ID_CURRENTCONDITIONS ); }
     get FORECASTHOURLY() { return document.getElementById( this.ID_FORECASTHOURLY ); }
@@ -280,6 +308,9 @@ class PageModifier {
     write( HTML, data ) { HTML.textContent = data; };
     unblur( HTML ) { HTML.classList.add( 'reveal' ); };
     blur( HTML ) { HTML.classList.remove( 'reveal' ); };
+
+    getID( id ) { return document.getElementById( id ); }
+    getHTML_QS( s ) { return document.querySelector( s ); }
     // clearTransform( HTML ) { HTML.style.transform = null; };
 
 }

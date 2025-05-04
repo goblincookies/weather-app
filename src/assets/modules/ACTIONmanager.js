@@ -9,7 +9,7 @@ class Interactions {
 
     constructor( ) { 
         document.addEventListener( 'mouseup', this.dragEnd );
-        document.addEventListener('touchend', this.dragEnd);
+        document.addEventListener( 'touchend', this.dragEnd );
     };
 
     // ADD LISTENERS TO ITEM
