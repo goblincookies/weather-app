@@ -16,7 +16,7 @@ const interactionTenDay = new Interactions();
 const autoComplete = new AutoComplete();
 
 
-const chartHeight = 160;
+const chartHeight = 60;
 const barshift = 60;
 let displayDay = 0;
 
@@ -70,15 +70,17 @@ function loadPage( data ) {
 };
 
 function tempToBarHeight( t ) {
-    // console.log( `taking Temp: ${t}; new Height ${ ( t + barshift) / 2 }`);
-    let adj_temp = t + barshift; // 80+30
-    adj_temp /= chartHeight; // 110/160
-    adj_temp = Math.tanh( adj_temp ); // .645 = .49
-    adj_temp *= chartHeight; // .49 * 160
-    adj_temp = Math.min( adj_temp, chartHeight );
-    return adj_temp;
-    // return Math.min( ( t + barshift), chartHeight );
-}
+
+    // let adj_temp = t + barshift; // 80+30
+    // adj_temp /= chartHeight; // 110/160
+    // adj_temp = Math.tanh( adj_temp ); // .645 = .49
+    // adj_temp *= chartHeight; // .49 * 160
+    // adj_temp = Math.min( adj_temp, chartHeight );
+
+
+    return barshift + ( t * chartHeight );
+    // return adj_temp;
+};
 
 function searchFocus( e ) {
     blurWholePage();
@@ -171,25 +173,19 @@ async function changeDisplay( e ) {
 
 async function updateHourlyChart( data, day ) {
 
-    // console.log( `updating hourly chart` );
-
     let hour = day < 1 ? parser.getCurrent_Hour( data ): 0 ;
-
-    // day = day < 1 ? parser.getCurrent_Day( data ) : day;
-    // let day = parser.getCurrent_Day( data );
-    // console.log( `current Hour: ${hour}` );
-    // console.log( `current Day: ${day}` );
 
     let dayJSON = parser.getDay( data, day );
     let hrJSON;
     let hr_data = {};
 
-    // MOVE TO PAGE MOD
-    const chartUl = pageModifier.HOURLYCHART; //document.getElementById( 'hourly-chart' );
+    const chartUl = pageModifier.HOURLYCHART;
     interactionChart.reset( chartUl );
 
-
     chartUl.textContent = '';
+
+    let tempMax = -100;
+    let tempMin = 100;
 
     for ( let bar = 0; bar + hour < 24; bar ++ ) {
         hr_data.hr = bar + hour;
@@ -204,6 +200,8 @@ async function updateHourlyChart( data, day ) {
 
         let HTML = pageBuilder.getHTML_Bar( `bar`, hr_data );
         chartUl.appendChild( HTML );
+        tempMax = Math.max( hr_data.temp, tempMax );
+        tempMin = Math.min( hr_data.temp, tempMin );
     };
 
     // DELAYED CHART DRAW
@@ -213,7 +211,9 @@ async function updateHourlyChart( data, day ) {
     Array.from( chartUl.children ).forEach( li => {
         const t = li.querySelector( 'p.temp' ).textContent;
         const bar = li.querySelector( 'div.bar-fill' );
-        bar.style.height = tempToBarHeight( parseInt( t ) ) + 'px';
+        let norm = (parseInt( t ) - tempMin ) / ( tempMax - tempMin );
+        // console.log( norm );
+        bar.style.height = tempToBarHeight( norm ) + 'px';
         bar.style.transitionDelay = `${n * 0.06}s`;
         n+=1;
     });

@@ -1,4 +1,4 @@
-import { PageBuilder } from "./HTMLbuilder";
+import { PageBuilder } from "../src/assets/modules/HTMLbuilder";
 
 class AutoComplete {
 
