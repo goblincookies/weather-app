@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect id="badge-stroke" x="0" y="0" width="60" height="60" style="fill:none;"/>
+    <g id="badge-stroke1" serif:id="badge-stroke">
+        <path d="M20.915,58.058L15.837,49.507L6.218,47.369L7.153,37.482L0.606,30L7.153,22.518L6.218,12.631L15.837,10.493L20.915,1.942L30,5.817L39.085,1.942L44.163,10.493L53.782,12.631L52.847,22.518L59.394,30L52.847,37.482L53.782,47.369L44.163,49.507L39.085,58.058L30,54.183L20.915,58.058ZM21.534,56.163L30,52.552L38.466,56.163L43.204,48.183L52.164,46.192L51.293,36.98L57.401,30L51.293,23.02L52.164,13.808L43.204,11.817L38.466,3.837L30,7.448L21.534,3.837L16.796,11.817L7.836,13.808L8.707,23.02L2.599,30L8.707,36.98L7.836,46.192L16.796,48.183L21.534,56.163Z"/>
+    </g>
+</svg>
