@@ -1,26 +1,48 @@
 import downloadedData from '../dataNewYork.json';
+import api from '../../../../api_keys/api_key_VisCroWea.json';
 
 class Grabber {
 
     useDebug = true;
     data;
+    URL = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/';
+    SEARCH;
+    KEY;
+    QUERY = '?key=';
 
     constructor( debug ){
         this.useDebug = debug;
+        this.KEY = this.QUERY + api.key;
     };
 
 
     set debug( val ) { this.useDebug = val; }
 
 
-    async getData( ) {
-        console.log( `getting data` );
-        // let data = {};
+    async getData( search ) {
+        console.log( `getting data for search: ${ search }` );
+        console.log( `using debug: ${ this.useDebug }` );
 
-        this.data = downloadedData;
-        await new Promise( ( resolve, reject ) => setTimeout( resolve, 2000 ) );        
-        console.log( 'debug time!' );
-        
+        if ( this.useDebug ) {
+            this.data = downloadedData;
+            await new Promise( ( resolve, reject ) => setTimeout( resolve, 2000 ) );        
+            return this.data;
+        };
+
+        console.log( search );
+        search = search.replace(/\s/g, '' );
+        console.log( search );
+
+        this.SEARCH = this.URL + search + this.KEY;
+        console.log( this.SEARCH );
+
+        // if ( !search ) { return; }
+
+        const response = await fetch( this.SEARCH, { mode: 'cors' } );
+        const searchData = await response.json();
+        this.data = searchData;
+        console.log( `reponse for search: ${ search }`);
+        console.log( searchData );
         return this.data;
     };
 
@@ -45,7 +67,7 @@ class Parser {
         const date = new Date( cc );
         return this.DAY_OF_THE_WEEK[ date.getDay() ];
     };
-    // getDays( JSON ) { return JSON.days[ day ] };
+    
     getCurrent( JSON ) { return JSON.currentConditions };
     getCurrent_Hour( JSON ) {
         const cc = JSON.currentConditions;
@@ -54,17 +76,6 @@ class Parser {
         hr = parseInt( time[ 1 ] ) > 30 ? this.mod( hr + 1, 24 ) : hr;
         return hr;
     };
-    
-    // IT SHOULD BE 0 (AKA TODAY) UNLESS WE'RE SAMPLING AT 23:31:00
-    // WHICH WILL ROUND UP THE HOUR TO 00:00:00
-    // AND THE DAY SHOULD INCREASE
-    // getCurrent_Day( JSON ) {
-    //     const cc = JSON.currentConditions;
-    //     const time = cc.datetime.split( ':' ); 
-    //     let min = parseInt( time[ 1 ] );
-    //     let day = min > 30 ? 1 : 0;
-    //     return day;
-    // };
 
     getCity( JSON ) {
         const rawAddress = JSON.resolvedAddress;

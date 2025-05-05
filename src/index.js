@@ -6,7 +6,7 @@ import { AutoComplete } from './assets/modules/Autocomplete';
 
 
 
-const grabber = new Grabber( true )
+const grabber = new Grabber( false )
 const parser = new Parser();
 const pageModifier = new PageModifier();
 const pageBuilder = new PageBuilder();
@@ -23,27 +23,16 @@ let displayDay = 0;
 async function setup() {
 
     // resize();
-
-    // document.querySelectorAll( '.pan' ).forEach( ( html ) => {
-    //     console.log( 'setting up drag interactions' );
-    //     console.log( html );
-    //     new Interactions( html );
-    // });
-    // interactions.addWatch( pageModifier.HOURLYCHART );
-    // interactions.addWatch( pageModifier.TENDAY );
-
     interactionChart.watch( pageModifier.HOURLYCHART )
     interactionTenDay.watch( pageModifier.TENDAY )
     autoComplete.watch( pageModifier.SEARCH );
-    // new Interactions( pageModifier.HOURLYCHART );
-    // new Interactions( pageModifier.TENDAY );
-
-    // console.log( pageModifier.TENDAY );
-
+    
     // CLEAR PAGE!
     blurWholePage();
     console.log( `requesting data` );
-    const data = await grabber.getData();
+    // const data = await grabber.getData();
+    const data = await grabber.getData( 'newark' );
+    console.log( 'passed getting data today' );
     loadPage( data );
     const inpt = document.querySelector('input.search');
     inpt.addEventListener('focus', searchFocus );
@@ -63,6 +52,10 @@ async function setup() {
 // }
 
 function loadPage( data ) {
+
+    interactionTenDay.reset( pageModifier.TENDAY );
+    interactionChart.reset( pageModifier.HOURLYCHART );
+
     updatePageInfo( data );
     updateSummary( data, 0 );
     updateHourlyChart( data, 0 );
@@ -70,16 +63,7 @@ function loadPage( data ) {
 };
 
 function tempToBarHeight( t ) {
-
-    // let adj_temp = t + barshift; // 80+30
-    // adj_temp /= chartHeight; // 110/160
-    // adj_temp = Math.tanh( adj_temp ); // .645 = .49
-    // adj_temp *= chartHeight; // .49 * 160
-    // adj_temp = Math.min( adj_temp, chartHeight );
-
-
     return barshift + ( t * chartHeight );
-    // return adj_temp;
 };
 
 function searchFocus( e ) {
@@ -88,13 +72,13 @@ function searchFocus( e ) {
     console.log( 'id directly?' );
 
     let name = e.currentTarget.name;
-    // const datalist = document.getElementById( name );
-    // console.log( 'id directly?' );
-
-    // datalist.style.display = 'block';
 };
 
-function searchBlur( e ) {
+async function searchBlur( e ) {
+    const search = e.currentTarget.value;
+    console.log( `searching!!: : : ${ search }` );
+    const data = await grabber.getData( search );
+    loadPage( data );
     unblurWholePage();
 };
 
@@ -115,7 +99,6 @@ function blurWholePage() {
     pageModifier.blur( pageModifier.CURRENTCONDITIONS );
     pageModifier.blur( pageModifier.FORECASTHOURLY );
     pageModifier.blur( pageModifier.FORECASTTENDAY );
-    // pageModifier.blur( pageModifier.FORECAS );
 }
 
 function unblurWholePage() {
@@ -166,9 +149,7 @@ async function changeDisplay( e ) {
         updateSummary( grabber.fetchedData, id );
         updateHourlyChart( grabber.fetchedData, id );
         unblurChart();
-        
     };
-
 };
 
 async function updateHourlyChart( data, day ) {
@@ -211,14 +192,16 @@ async function updateHourlyChart( data, day ) {
     Array.from( chartUl.children ).forEach( li => {
         const t = li.querySelector( 'p.temp' ).textContent;
         const bar = li.querySelector( 'div.bar-fill' );
-        let norm = (parseInt( t ) - tempMin ) / ( tempMax - tempMin );
+        let norm = 0.5;
+        if ( tempMax - tempMin > 1 ) {
+            norm = (parseInt( t ) - tempMin ) / ( tempMax - tempMin );
+        };
         // console.log( norm );
         bar.style.height = tempToBarHeight( norm ) + 'px';
         bar.style.transitionDelay = `${n * 0.06}s`;
         n+=1;
     });
 
-    // interactionChart = new Interactions( chartUl );
 };
 
 function updateTenDay( data ) {

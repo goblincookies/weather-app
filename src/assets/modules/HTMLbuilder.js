@@ -207,7 +207,7 @@ class PageBuilder {
         //         <img class="icon-sm" id="hour-icon-0" src="./assets/images/sunny.svg" alt="">
         //     </div>
         //     <div class="rain">
-        //         <p class="p4" id="hour-rain-0">XX</p>
+        //         <p class="debugA p4" id="hour-rain-0">XX</p>
         //     </div>
         // </li>
 
@@ -227,7 +227,7 @@ class PageBuilder {
         const iconImg = this.createElement( 'img', 'icon-sm non', this.ICONS_ALL[ hr_data.icon ] );
 
         const rainDiv = this.createElement( 'div', 'rain box-hold' );
-        const rainP = this.createElement( 'p', 'p4' );
+        const rainP = this.createElement( 'p', 'p4 text-center' );
 
         mainLi.id = `bar-${ n }`;
         hrP.textContent = hr_data.hr;
