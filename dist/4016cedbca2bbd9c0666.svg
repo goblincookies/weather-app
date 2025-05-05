@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect id="badge-fill" x="0" y="0" width="60" height="60" style="fill:none;"/>
+    <path d="M20.915,58.058L15.837,49.507L6.218,47.369L7.153,37.482L0.606,30L7.153,22.518L6.218,12.631L15.837,10.493L20.915,1.942L30,5.817L39.085,1.942L44.163,10.493L53.782,12.631L52.847,22.518L59.394,30L52.847,37.482L53.782,47.369L44.163,49.507L39.085,58.058L30,54.183L20.915,58.058Z"/>
+</svg>
