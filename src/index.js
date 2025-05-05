@@ -39,18 +39,6 @@ async function setup() {
 
 };
 
-// function resize() {
-//     const upperDiv = document.querySelector( 'div.upper' );
-//     const tenDay = document.getElementById( 'ten-day' );
-
-//     const upperStyle = getComputedStyle(upperDiv);
-//     const left = parseInt( upperStyle.marginLeft ) + parseInt( upperStyle.paddingLeft );
-
-//     // CENTER IT IF YOU CAN
-//     // DISABLE PANNING IF IT'S ENTIRELY VISIBLE
-//     tenDay.style.transform = `translateX( ${ left }px)`;
-// }
-
 function loadPage( data ) {
 
     interactionTenDay.reset( pageModifier.TENDAY );
@@ -66,8 +54,20 @@ function tempToBarHeight( t ) {
     return barshift + ( t * chartHeight );
 };
 
+function colapseBars(){
+    const chartUl = pageModifier.HOURLYCHART;
+    let n = 0;
+    Array.from( chartUl.children ).forEach( li => {
+        const bar = li.querySelector( 'div.bar-fill' );
+        bar.style.height = '0px';
+        bar.style.transitionDelay = `${n * 0.02}s`;
+        n += 1;
+    });
+}
+
 function searchFocus( e ) {
     blurWholePage();
+    colapseBars();
     e.currentTarget.addEventListener( 'blur', searchBlur );
     console.log( 'id directly?' );
 
@@ -135,15 +135,14 @@ async function changeDisplay( e ) {
     
     if ( id != displayDay ) {
         // transition();
-
-        
         pageBuilder.removeButtonSelect( displayDay );
         pageBuilder.addButtonSelect( id );
-
+        
         // console.log( li );
         console.log( `switching to ${ id }, current page ${ displayDay }`);
         displayDay = id;
-
+        
+        colapseBars();
         blurChart();
         await new Promise( ( resolve, reject ) => setTimeout( resolve, 800 ) );
         updateSummary( grabber.fetchedData, id );
@@ -208,6 +207,7 @@ function updateTenDay( data ) {
 
     const tenDayUL = document.getElementById( 'ten-day' );
     tenDayUL.textContent = '';
+    displayDay = 0;
 
     let dayJSON;
     let date_data = { temp_high:0, temp_low:0, uvindex:4, icon:'fog', precip:0, day_of:0, date:0 };
