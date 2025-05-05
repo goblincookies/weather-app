@@ -186,7 +186,7 @@ async function updateHourlyChart( data, day ) {
 
     // DELAYED CHART DRAW
     await new Promise( ( resolve, reject ) => setTimeout( resolve, 800 ) );
-    let n = 0;
+    let n = 0; 
     // console.log('adding height');
     Array.from( chartUl.children ).forEach( li => {
         const t = li.querySelector( 'p.temp' ).textContent;
