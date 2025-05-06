@@ -1,3 +1,4 @@
+// ICONS
 import f_uvBadge from '../images/badge-fill.svg';
 import f_clearDay from '../images/clear-day.svg';
 import f_clearNight from '../images/clear-night.svg';
@@ -24,6 +25,7 @@ import f_thunderShowersNight from '../images/thunder-showers-night.svg';
 import f_thunder from '../images/thunder.svg';
 import f_wind from '../images/wind.svg';
 
+// HELPER CLASS FOR BUILDING HTML ELEMENTS
 class PageBuilder {
 
     ICONS_ALL = {
@@ -45,7 +47,7 @@ class PageBuilder {
 
     UV_SCALE = [2,5,7,10];
 
-    // HELPER FUNCTION
+    // HELPER FUNCTION FOR CREATING HTML ELEMENTS WITH CLASSES
     createElement ( type, classes, src) {
         let element = document.createElement( type );
         for(const el of classes.split(' ')) {
@@ -56,6 +58,8 @@ class PageBuilder {
         return element;
     };
 
+    // GET THE CSS CLASS TO RECOLOR THE SVG
+    // UV1, UV2, UV3, UV4
     getCSS_Filter( num ) {
         num = Math.max( num, 0 );
 
@@ -64,20 +68,23 @@ class PageBuilder {
             if( num <= rating ) { return 'uv'+ i; }
             i += 1;
         });
-
         return 'uv'+ i;
     };
 
+    // REMOVES THE SELECTED CLASS
     removeButtonSelect( id ) {
         const HTML = document.getElementById( `day-${ id }`);
         HTML.querySelector( 'button' ).classList.remove( 'selected' );
     };
 
+    // ADDS THE SELECTED CLASS
     addButtonSelect( id ) {
         const HTML = document.getElementById( `day-${ id }`);
         HTML.querySelector( 'button' ).classList.add( 'selected' );
     };
 
+    // RETURNS A SEARCH OPTION DIV
+    // BOLD + TEXT = WHOLE SEARCH
     getHTML_Item( bold, text ) {
         const mainDiv = this.createElement( 'div', 'item' );
         const mainInput = this.createElement( 'input', '' );
@@ -85,39 +92,29 @@ class PageBuilder {
             const textStrong = this.createElement( 'strong', '' );
             textStrong.textContent = bold;
             mainDiv.appendChild( textStrong );
-        }
+        };
         mainDiv.innerHTML += text;
         mainInput.type = 'hidden';
         mainInput.value = bold + text;
 
         mainDiv.appendChild( mainInput );
-
-        // b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
         return mainDiv;
     };
 
-    // getHTML_Option( text ){
-    //     // <option value="London">London</option>
-    //     const mainOption = this.createElement( 'option', '' );
-    //     mainOption.textContent = text;
-    //     mainOption.value = text;
-    //     return mainOption;
-    // };
-
+    // RETURNS A BUTTON FOR THE 10-DAY FORECAST
     getHTML_TenDayButton( day, date_data ) {
+        // HTML:
+
         // <li class="">
         //     <button class="pill flex-v gap-sm selected">
         //         <div class="flex-v">
         //             <p class="p2 bold">186</p>
         //             <p class="p2">67</p>
         //         </div>
-                
         //         <div class=" wide flex-center relative">
         //             <img class=" icon-md" src="./assets/images/badge.svg" alt="">
         //             <p class="cent">14</p>
         //         </div>
-
-                
         //         <div class=" wide">
         //             <img class="icon-lg" src="./assets/images/sunny.svg" alt="">
         //         </div>
@@ -128,7 +125,6 @@ class PageBuilder {
         //             <p class="bold">Today</p>
         //             <p>4/24</p>
         //         </div>
-
         //     </button>
         // </li>
 
@@ -157,14 +153,13 @@ class PageBuilder {
         dayOfP.textContent = date_data.day_of;
         dateP.textContent = date_data.date;
 
-
+        // ONLY DRAWS THE UVINDEX IF IT'S VALUE IS GREATER THAN 0
         if ( date_data.uvindex > 0 ) {
             uvP.textContent = date_data.uvindex;
             uvImg.classList.add( this.getCSS_Filter( date_data.uvindex ) );
         } else {
             uvImg.classList.add( 'hide' );
-        }
-
+        };
 
         hiLoDiv.appendChild( hiP );
         hiLoDiv.appendChild( loP );
@@ -190,7 +185,10 @@ class PageBuilder {
         return( mainLi );
     };
 
+    // RETURNS A SINGLE BAR FOR THE BAR CHART
     getHTML_Bar( n, hr_data ) {
+        // HTML:
+
         // <li class=" flex-v" id="bar-0">
         //     <div class="marg-top-sm flex-v">
         //         <p class="p4 light">NOW </p>
@@ -223,7 +221,6 @@ class PageBuilder {
         const uvP = this.createElement( 'p', 'cent' );
 
         const iconDiv = this.createElement( 'div' , 'box-hold icon flex-center' );
-        console.log( `looking for icon: ${ hr_data.icon }` );
         const iconImg = this.createElement( 'img', 'icon-sm non', this.ICONS_ALL[ hr_data.icon ] );
 
         const rainDiv = this.createElement( 'div', 'rain box-hold' );
@@ -233,20 +230,19 @@ class PageBuilder {
         hrP.textContent = hr_data.hr;
         tempP.textContent = hr_data.temp;
         
-        
+        // ONLY DRAWS THE UVINDEX IF IT'S VALUE IS GREATER THAN 0
         if ( hr_data.uvindex > 0 ) {
             uvP.textContent = hr_data.uvindex;
             uvImg.classList.add( this.getCSS_Filter( hr_data.uvindex ) );
         } else {
             uvImg.classList.add( 'hide' );
-        }
-
+        };
 
         let precip = hr_data.precip.split( '%' )[ 0 ];
         precip = parseInt( precip );
-        if ( precip > 0 ) { rainP.textContent = hr_data.precip; }
 
-        // barFillDiv.style.height = hr_data.height + 'px';
+        // ONLY DRAWS THE PRECIP IF IT'S VALUE IS GREATER THAN 0
+        if ( precip > 0 ) { rainP.textContent = hr_data.precip; }
 
         barBackDiv.appendChild( barFillDiv );
         topDiv.appendChild( hrP );
@@ -268,9 +264,27 @@ class PageBuilder {
         return mainLi;
     };
 
+    // RETURNS DIV FOR AUTOCOMPLETE AND ERRORS
+    getHTML_SearchContainer( id, classes ){
+        const mainDiv = this.createElement( 'div', classes );
+        mainDiv.id = id;
+        return mainDiv;
+    };
+
+    searchError( id, classes, search ) {
+        const mainDiv = this.getHTML_SearchContainer( id, classes );
+        const item = this.getHTML_Item( search, ' is not valid, try again' );
+        item.querySelector( 'input' ).remove();
+        mainDiv.appendChild( item );
+        
+        return mainDiv
+    };
+
 };
 
+// HELPER CLASS FOR MODIFYING AND SEARCHING FOR ELEMENTS
 class PageModifier {
+    // ID'S USED ON THE PAGE
     ID_CITY = 'city';
     ID_CONDITIONS = 'conditions';
     ID_TEMP = 'temp';
@@ -280,13 +294,15 @@ class PageModifier {
     ID_CURRENTCONDITIONS = 'current-conditions';
     ID_FORECASTHOURLY = 'forecast-hourly';
     ID_FORECASTTENDAY = 'forecast-ten-day';
-
     ID_HOURLYCHART = 'hourly-chart';
     ID_TENDAY = 'ten-day';
     ID_GRADIENT = 'div.gradient';
     ID_SEARCH = 'input.search';
+    ID_FORM = 'form';
 
-    // get GRADIENT() { return document.querySelector( this.ID_GRADIENT ); }
+    // RETURNS HTML ELEMENTS
+    // NEEDS ERROR CATCHING :(
+    // BUT AT LEAST THEYRE ALL IN A SINGLE PLACE!
     get GRADIENT() { return this.getHTML_QS( this.ID_GRADIENT ); }
     get SEARCH() { return this.getHTML_QS( this.ID_SEARCH ); }
 
@@ -302,8 +318,7 @@ class PageModifier {
     get UVINDEX() { return document.getElementById( this.ID_UVINDEX ); }
     get HOURLYCHART() { return document.getElementById( this.ID_HOURLYCHART ); }
     get TENDAY() { return document.getElementById( this.ID_TENDAY ); }
-
-    // get TEMP() { return document.getElementById( this.ID_TEMP ); }
+    get FORM() {return document.getElementById( this.ID_FORM); }
 
     write( HTML, data ) { HTML.textContent = data; };
     unblur( HTML ) { HTML.classList.add( 'reveal' ); };
@@ -311,9 +326,13 @@ class PageModifier {
 
     getID( id ) { return document.getElementById( id ); }
     getHTML_QS( s ) { return document.querySelector( s ); }
-    // clearTransform( HTML ) { HTML.style.transform = null; };
+    clearError( ) {
+        this.SEARCH.classList.remove( 'error' );
+        this.SEARCH.classList.textContent = '';
+    }
+    addError( ) { this.SEARCH.classList.add( 'error' ); }
 
-}
+};
 
 
 export { PageBuilder, PageModifier };

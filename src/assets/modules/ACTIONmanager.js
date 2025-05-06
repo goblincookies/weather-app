@@ -28,8 +28,6 @@ class Interactions {
 
     // TRIGGERS WHEN A DRAG IS DETECTED
     dragStart = ( e ) => {
-        console.log( 'touch' );
-        console.log( e.currentTarget );
 
         e.preventDefault();
 

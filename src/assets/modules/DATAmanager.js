@@ -1,55 +1,74 @@
 import downloadedData from '../dataNewYork.json';
 import api from '../../../../api_keys/api_key_VisCroWea.json';
+import { PageBuilder, PageModifier } from './HTMLbuilder';
 
+// HELPER CLASS FOR GRABBING DATA
 class Grabber {
 
     useDebug = true;
     data;
+    // PIECES OF THE API SEARCH FOR QUICK REASSEMBLY
     URL = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/';
     SEARCH;
     KEY;
     QUERY = '?key=';
 
+    // DEBUG TOGGLES DOWNLOADED DATA VS ONLINE DATA
     constructor( debug ){
         this.useDebug = debug;
         this.KEY = this.QUERY + api.key;
     };
 
-
     set debug( val ) { this.useDebug = val; }
 
-
+    // RETURNS DATA BASED ON SEARCH VALUE
     async getData( search ) {
         console.log( `getting data for search: ${ search }` );
         console.log( `using debug: ${ this.useDebug }` );
 
+        const pageModifier = new PageModifier();
+
+        // IF DEBUGING, IT PAUSES 2 SECONDS AND THEN RETURNS DOWNLOADED DATA
         if ( this.useDebug ) {
             this.data = downloadedData;
             await new Promise( ( resolve, reject ) => setTimeout( resolve, 2000 ) );        
             return this.data;
         };
 
-        console.log( search );
+        // REPLACE SPACES
         search = search.replace(/\s/g, '' );
-        console.log( search );
 
         this.SEARCH = this.URL + search + this.KEY;
-        console.log( this.SEARCH );
+        
+        // THE SEARCH
+        try {
+            const response = await fetch( this.SEARCH, { mode: 'cors' } );
+            const searchData = await response.json();
+            this.data = searchData;
+        } catch ( err ) {
+            console.log( `error getting: ${ search }` )
 
-        // if ( !search ) { return; }
+            // SHOW THE WARNING
+            const pageBuilder = new PageBuilder();
+            pageModifier.addError();
 
-        const response = await fetch( this.SEARCH, { mode: 'cors' } );
-        const searchData = await response.json();
-        this.data = searchData;
-        console.log( `reponse for search: ${ search }`);
-        console.log( searchData );
+            const searchHTML = pageModifier.SEARCH;
+            const id = searchHTML.id + '-' + 'autocomplete-list';
+            const classes = 'autocomplete-items';
+            const error = pageBuilder.searchError( searchHTML.id, classes, search );
+            searchHTML.parentNode.appendChild( error );
+            this.data = null;
+        };
+
         return this.data;
     };
 
+    // CACHED DATA FOR 10-DAY FORECAST
     get fetchedData() { return this.data };
 
 };
 
+// HELPER CLASS FOR EASILY PARSING DATA
 class Parser {
 
     DAY_OF_THE_WEEK = ['Sun', 'Mon', 'Tues', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -95,8 +114,6 @@ class Parser {
     getPrecip( JSON ) { return Math.round( JSON.precipprob ) + '%'; };
     getUVIndex( JSON ) { return Math.round( JSON.uvindex ); };
     getIcon( JSON ) { return JSON.icon; };
-
-    // getHour( JSON ) { return JSON.split(':')[0] };
 };
 
 export { Grabber, Parser };

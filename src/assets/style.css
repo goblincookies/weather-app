@@ -95,7 +95,7 @@ h4 { font-size: var(--h4); }
 .uv2 { filter: invert(65%) sepia(32%) saturate(3961%) hue-rotate(350deg) brightness(101%) contrast(102%);}
 .uv3 { filter: invert(21%) sepia(78%) saturate(7469%) hue-rotate(346deg) brightness(104%) contrast(101%);}
 .uv4 { filter: invert(20%) sepia(71%) saturate(5451%) hue-rotate(307deg) brightness(105%) contrast(103%);}
-
+.error{ border: 4px solid var(--accent) !important ; }
 .basic-vert-padding{
     padding-top: var(--basic-pad);
     padding-bottom: var(--basic-pad);
@@ -297,6 +297,7 @@ h4 { font-size: var(--h4); }
     color: #fff;
 
 }
+
 .item:hover{
     background-color: lightblue;
 }

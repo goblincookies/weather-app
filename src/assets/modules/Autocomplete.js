@@ -1,13 +1,27 @@
-import { PageBuilder } from "./HTMLbuilder";
+import { PageBuilder, PageModifier } from "./HTMLbuilder";
 
-
+// HELPER CLASS FOR ADDING AUTOCOMPLETE TO THE SEARCH
 class AutoComplete {
 
-    // CITY LIST IS HARD CODED AS ARRAY
+    // THE LIST OF ALL CITIES IS A HARD CODED AS ARRAY
     // AT THE BOTTOM OF THIS CLASS
+
+    // THEY ARE FROM HERE: https://github.com/lutangar/cities.json
+    // TO SHRINK THE FILESIZE, I REMOVED THEM FROM THE JSON
+    // AND MADE A LIST OUT OF THEM
+
+    // I HAVE ALSO REMOVED DUPLICATES. FOR EXAMPLE, THERE ARE 36 PLACES
+    // NAMED 'Oakland' IN AMERICA. BUT SINCE MY SOLUTION IS VERY SHORT
+    // SIGHTED, YOU WILL ONLY GET THE FIRST CITY VISUAL CROSSING CHOOSES.
+
+    // THIS SHOULD 100% BE MOVED OUTSIDE THE CLASS AND PROBABLY
+    // ONTO A SERVER TO FETCH THE DATA
+    // BUT IT IS A SMALL PROJECT
+
     HTMLinput;
     currentFocus = -1;
-    pageBuilder = new PageBuilder
+    pageBuilder = new PageBuilder();
+    pageModifier = new PageModifier();
     class_active = 'autocomplete-active';
     class_items = 'autocomplete-items';
     class_list = 'autocomplete-list';
@@ -21,18 +35,21 @@ class AutoComplete {
     };
 
     onInput = ( e ) => {
-        console.log( 'registered input' );
         this.closeAllLists();
         let val = this.HTMLinput.value;
         if ( !val ) { return false; }
         
         this.currentFocus = -1;
-        // CREATE DIV THAT WILL CONTAIN ITEMS
-        let list = document.createElement( 'div' );
-        list.id = this.HTMLinput.id + '-' + this.class_list;
-        list.classList.add( this.class_items );
 
+        // CREATE THE DIV THAT WILL CONTAIN THE SEARCH ITEMS
+        const id = this.HTMLinput.id + '-' + this.class_list;
+        const list = this.pageBuilder.getHTML_SearchContainer( id, this.class_items );
         this.HTMLinput.parentNode.appendChild( list );
+
+        // let list = document.createElement( 'div' );
+        // list.id = this.HTMLinput.id + '-' + this.class_list;
+        // list.classList.add( this.class_items );
+        // this.HTMLinput.parentNode.appendChild( list );
 
         let onDisplay = 10
 
@@ -44,8 +61,13 @@ class AutoComplete {
                 let text = this.cities[ i ].substring( val.length );
                 let item = this.pageBuilder.getHTML_Item( bold, text );
 
+                // MOUSEDOWN HANDLES MOUSE CLICK
+                // BECAUSE THE DATA WAS SENDING BEFORE CLICK REGISTERD
+                // CLICK HANDLES KEYBOARD INPUT, THAT IS HANDLED
+                // IN THE CORRECT ORDER
+                item.addEventListener( 'mousedown', this.onClick );
                 item.addEventListener( 'click', this.onClick );
-                
+    
                 list.appendChild( item );
                 onDisplay -= 1;
             };
@@ -74,22 +96,24 @@ class AutoComplete {
             if ( this.currentFocus > -1 ) {
                 if ( list ) {
                     list[ this.currentFocus ].click();
+                    this.currentFocus = -1;
                     this.HTMLinput.blur();
-
                 };
             } else {
-                // NOT TRIGGERING THE FIRST TIME!!
                 this.HTMLinput.blur();
                 this.closeAllLists();
             };
+            this.pageModifier.SEARCH.blur();
         };
     };
     
 
     onClick = ( e ) => {
+        e.preventDefault();
         const input = e.currentTarget.querySelector( 'input' );
         this.HTMLinput.value = input.value;
         this.closeAllLists();
+        this.pageModifier.SEARCH.blur();
     };
 
     cancel = () => {

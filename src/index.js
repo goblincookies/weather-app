@@ -10,37 +10,37 @@ const grabber = new Grabber( false )
 const parser = new Parser();
 const pageModifier = new PageModifier();
 const pageBuilder = new PageBuilder();
-// const interactions = new Interactions();
 const interactionChart = new Interactions();
 const interactionTenDay = new Interactions();
 const autoComplete = new AutoComplete();
-
 
 const chartHeight = 60;
 const barshift = 60;
 let displayDay = 0;
 
+// SETUP
 async function setup() {
 
-    // resize();
     interactionChart.watch( pageModifier.HOURLYCHART )
     interactionTenDay.watch( pageModifier.TENDAY )
     autoComplete.watch( pageModifier.SEARCH );
     
     // CLEAR PAGE!
     blurWholePage();
+
     console.log( `requesting data` );
-    // const data = await grabber.getData();
-    const data = await grabber.getData( 'newark' );
-    console.log( 'passed getting data today' );
+    // POPULATE WITH DEFAULT SEARCH
+    const data = await grabber.getData( 'new york city' );
     loadPage( data );
+    
     const inpt = document.querySelector('input.search');
     inpt.addEventListener('focus', searchFocus );
-
 };
 
+// DRAW THE PAGE 
 function loadPage( data ) {
 
+    // RESET HORIZONTAL TRANSLATE
     interactionTenDay.reset( pageModifier.TENDAY );
     interactionChart.reset( pageModifier.HOURLYCHART );
 
@@ -50,10 +50,11 @@ function loadPage( data ) {
     updateTenDay( data );
 };
 
-function tempToBarHeight( t ) {
-    return barshift + ( t * chartHeight );
-};
+// HELPER FUNCTION TO GET SCALED BAR HEIGHT
+function tempToBarHeight( t ) { return barshift + ( t * chartHeight ); };
 
+// ZERO'S OUT THE HEIGHT OF THE BARS
+// AND ADDS A DELAY FOR CSS TRANSITION
 function colapseBars(){
     const chartUl = pageModifier.HOURLYCHART;
     let n = 0;
@@ -63,37 +64,61 @@ function colapseBars(){
         bar.style.transitionDelay = `${n * 0.02}s`;
         n += 1;
     });
-}
-
-function searchFocus( e ) {
-    blurWholePage();
-    colapseBars();
-    e.currentTarget.addEventListener( 'blur', searchBlur );
-    console.log( 'id directly?' );
-
-    let name = e.currentTarget.name;
 };
 
+// TRIGGERS WHEN SEARCH BOX IS IN FOCUS
+function searchFocus( e ) {
+    pageModifier.clearError();
+    blurWholePage();
+    colapseBars();
+    // const form = pageModifier.FORM;
+    e.currentTarget.addEventListener( 'blur', searchBlur );
+};
+
+// // TRIGGERS WHEN SUBMIT
+// async function onSubmit( e ) {
+//     console.log('submitting!')
+//     // document.getElementById('theForm').submit();
+//     const search = e.currentTarget.value;
+//     console.log( `searching!!: : : ${ search }` );
+//     const data = await grabber.getData( search );
+//     if ( data ) {
+//         loadPage( data );
+//         unblurWholePage();
+//     };
+//     return false;
+// };
+
+// TRIGGERS WHEN DONE SEARCHING
 async function searchBlur( e ) {
+    console.log( 'blur' )
+
     const search = e.currentTarget.value;
     console.log( `searching!!: : : ${ search }` );
     const data = await grabber.getData( search );
-    loadPage( data );
-    unblurWholePage();
+    if ( data ) {
+        loadPage( data );
+        unblurWholePage();
+    };
 };
 
+// BLURS ONLY THE TOP HALF
+// USED WHEN SELECTING FROM 10-DAY
 function blurChart() {
     pageModifier.unblur( pageModifier.GRADIENT );
     pageModifier.blur( pageModifier.CURRENTCONDITIONS );
     pageModifier.blur( pageModifier.FORECASTHOURLY );
 };
 
+// UNBLURS TOP HALF
 function unblurChart() {
     pageModifier.blur( pageModifier.GRADIENT );
     pageModifier.unblur( pageModifier.CURRENTCONDITIONS );
     pageModifier.unblur( pageModifier.FORECASTHOURLY );
 };
 
+// BLURS THE WHOLE PAGE
+// USED WHEN LOADING NEW DATA
 function blurWholePage() {
     pageModifier.unblur( pageModifier.GRADIENT );
     pageModifier.blur( pageModifier.CURRENTCONDITIONS );
@@ -101,6 +126,7 @@ function blurWholePage() {
     pageModifier.blur( pageModifier.FORECASTTENDAY );
 }
 
+// UNBLURS THE WHOLE PAGE
 function unblurWholePage() {
     pageModifier.blur( pageModifier.GRADIENT );
     pageModifier.unblur( pageModifier.CURRENTCONDITIONS );
@@ -108,25 +134,25 @@ function unblurWholePage() {
     pageModifier.unblur( pageModifier.FORECASTTENDAY );
 }
 
+// WRITES THE CITY INFORMATION
 function updatePageInfo( data ) {
-    const currJSON = parser.getCurrent( data );
     pageModifier.write( pageModifier.CITY, parser.getCity( data ) );
-
     unblurWholePage();
 };
 
+// WRITES THE DAY SUMMARY
 function updateSummary( data, day ){
-
     let JSON = day < 1 ? parser.getCurrent( data ) : parser.getDay( data, day );
-
     pageModifier.write( pageModifier.CONDITIONS, parser.getConditions( JSON ) );
     pageModifier.write( pageModifier.TEMP, parser.getTemp( JSON ) );
     pageModifier.write( pageModifier.FEELSLIKE, parser.getFeelsLike( JSON ) );
     pageModifier.write( pageModifier.PRECIP, parser.getPrecip( JSON ) );
     pageModifier.write( pageModifier.UVINDEX, parser.getUVIndex( JSON ) );
-
 };
 
+// TRIGGERS WHEN 10-DAY BUTTON IS CLICKED
+// IT CONTROLS THE TRANSITION, AND LOADS
+// THE DATA INTO THE SUMMARY AND CHART
 async function changeDisplay( e ) {
 
     let li = e.currentTarget.closest( 'li' );
@@ -137,21 +163,31 @@ async function changeDisplay( e ) {
         pageBuilder.removeButtonSelect( displayDay );
         pageBuilder.addButtonSelect( id );
         
-        // console.log( li );
         console.log( `switching to ${ id }, current page ${ displayDay }`);
         displayDay = id;
         
         colapseBars();
         blurChart();
+
+        // ADD A SLIGHT DELAY:
         await new Promise( ( resolve, reject ) => setTimeout( resolve, 800 ) );
+
         updateSummary( grabber.fetchedData, id );
         updateHourlyChart( grabber.fetchedData, id );
         unblurChart();
     };
 };
 
+// DRAWS THE CHART
 async function updateHourlyChart( data, day ) {
 
+    // IF THE DAY IS '0' THE STARTING HOUR WILL BE THE CURRENT
+    // HOUR AND ONLY REMAINING HOURS WILL BE DRAWN
+    // ALL OTHER DAYS WILL START AT '0'
+    // 
+    // THERE IS PROBABLY AN EDGE CASE WHEN CHECKING THE WEATHER
+    // AT 23:45 WILL ROUND UP AND MOD BACK TO 0, SHOWING THE
+    // ENTIRE DAY INSTEAD OF THE LAST HOUR
     let hour = day < 1 ? parser.getCurrent_Hour( data ): 0 ;
 
     let dayJSON = parser.getDay( data, day );
@@ -166,6 +202,7 @@ async function updateHourlyChart( data, day ) {
     let tempMax = -100;
     let tempMin = 100;
 
+    // FOR EACH HOUR REMAINING IN THE DAY, DRAW THE HTML
     for ( let bar = 0; bar + hour < 24; bar ++ ) {
         hr_data.hr = bar + hour;
         hrJSON = parser.getHour( dayJSON, hr_data.hr );
@@ -173,8 +210,6 @@ async function updateHourlyChart( data, day ) {
         hr_data.uvindex = parser.getUVIndex( hrJSON );
         hr_data.icon = parser.getIcon( hrJSON );
         hr_data.precip = parser.getPrecip( hrJSON );
-        hr_data.height = tempToBarHeight( hr_data.temp );
-
         hr_data.hr = ( bar < 1 && day < 1 ) ? 'NOW' : `${ hr_data.hr}:00`;
 
         let HTML = pageBuilder.getHTML_Bar( `bar`, hr_data );
@@ -183,10 +218,13 @@ async function updateHourlyChart( data, day ) {
         tempMin = Math.min( hr_data.temp, tempMin );
     };
 
-    // DELAYED CHART DRAW
+    // ADD DELAY BEFORE CHART DRAW
     await new Promise( ( resolve, reject ) => setTimeout( resolve, 800 ) );
+
+    // ADD ANIMATION: Modify the CSS HEIGHT BASED ON THE TEMP VALUE
+    // IF THE HEIGHT IS CHANGED WHEN DRAWING THE HTML,
+    // THE CSS TRANSITION DOESN'T TRIGGER, SO NO ANIMATION
     let n = 0; 
-    // console.log('adding height');
     Array.from( chartUl.children ).forEach( li => {
         const t = li.querySelector( 'p.temp' ).textContent;
         const bar = li.querySelector( 'div.bar-fill' );
@@ -194,7 +232,6 @@ async function updateHourlyChart( data, day ) {
         if ( tempMax - tempMin > 1 ) {
             norm = (parseInt( t ) - tempMin ) / ( tempMax - tempMin );
         };
-        // console.log( norm );
         bar.style.height = tempToBarHeight( norm ) + 'px';
         bar.style.transitionDelay = `${n * 0.06}s`;
         n+=1;
@@ -202,6 +239,7 @@ async function updateHourlyChart( data, day ) {
 
 };
 
+// DRAWS THE 10-DAY BUTTONS
 function updateTenDay( data ) {
 
     const tenDayUL = document.getElementById( 'ten-day' );
@@ -228,9 +266,8 @@ function updateTenDay( data ) {
 
         tenDayUL.appendChild( HTML );
         HTML.querySelector( 'button' ).addEventListener( 'click', changeDisplay );
+        HTML.querySelector( 'button' ).addEventListener( 'touchend', changeDisplay );
     };
-
-    // interactionTenDay = new Interactions( tenDayUL );
 };
 
 setup();
