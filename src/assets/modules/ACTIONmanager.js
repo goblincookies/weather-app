@@ -18,8 +18,20 @@ class Interactions {
         HTML.addEventListener( 'touchstart', this.dragStart );
     };
 
+    touchStart = ( e ) => {
+        // console.log( 'touch' );
+    }
+
+    mouseStart = ( e ) => {
+
+    }
+
     // TRIGGERS WHEN A DRAG IS DETECTED
     dragStart = ( e ) => {
+        console.log( 'touch' );
+        console.log( e.currentTarget );
+
+        e.preventDefault();
 
         // MAKE SURE IT'S A VIABLE ITEM
         // THIS IS USEFUL FOR DISABLING
@@ -28,6 +40,10 @@ class Interactions {
             this.draggingItem = e.currentTarget;
             this.boundingBox = e.currentTarget.closest( '.bounding-box' );
             this.pointerStartX = e.clientX || e.touches[0].clientX;
+
+            // console.log( e.clientX );
+
+            console.log( e.clientX  || e.touches[0].clientX );
 
             // IF WE HAVE LOADED VALID ITEMS,
             // CALC THE MAX MOVEMENT
@@ -51,17 +67,39 @@ class Interactions {
     // TRIGGERS WHEN DRAGGING
     drag = ( e ) => {
 
+        e.preventDefault();
+        console.log( 'dragging!' );
+        console.log( e.clientX )
+        console.log( !e.touches );
+
         // PROTECTS AGAINST 'STICKY' DRAGS
         if ( e.buttons < 1 ) {
             this.dragEnd();
             return;
         };
 
-        // CHECK IF OUTSIDE THE BOUNDS OF THE WINDOW
-        if ( !e.clientX || !e.clientY ) {
-            this.dragEnd();
-            return;
-        };
+
+        // console.log( 'still!' );
+        // // IF THERE IS TOUCH && X || Y IS NULL
+        // // IF THERE IS INPUT && X || Y IS NULL
+
+        // const mouseInput = ( e.clientX || e.clientY );
+        // const touchInput = ( e.touches[0].clientX || e.clientY );
+        
+        
+        // // THIS IS NULLIFYING THE TOUCH INPUT
+        // // CHECK IF OUTSIDE THE BOUNDS OF THE WINDOW
+        // if ( !e.clientX || !e.clientY ) {
+        //     console.log( 'outside bounds' )
+        //     console.log( !e.clientX )
+        //     console.log( !e.clientY )
+
+        //     this.dragEnd();
+        //     return;
+        // };
+
+        console.log( 'still!' );
+
 
         // VERIFY AN ITEM HAS BEEN FOUND
         if ( this.draggingItem && this.boundingBox ) {

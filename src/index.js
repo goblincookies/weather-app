@@ -6,7 +6,7 @@ import { AutoComplete } from './assets/modules/Autocomplete';
 
 
 
-const grabber = new Grabber( false )
+const grabber = new Grabber( true )
 const parser = new Parser();
 const pageModifier = new PageModifier();
 const pageBuilder = new PageBuilder();
@@ -19,6 +19,7 @@ const autoComplete = new AutoComplete();
 const chartHeight = 60;
 const barshift = 60;
 let displayDay = 0;
+
 
 async function setup() {
 
@@ -132,7 +133,6 @@ async function changeDisplay( e ) {
     let li = e.currentTarget.closest( 'li' );
     let id = li.id.split("-")[ 1 ];
 
-    
     if ( id != displayDay ) {
         // transition();
         pageBuilder.removeButtonSelect( displayDay );
