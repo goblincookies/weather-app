@@ -1,7 +1,5 @@
 # SCRATCH
-.scratch
-
-.env
+scratch/
 
 # Logs
 logs
