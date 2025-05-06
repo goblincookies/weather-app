@@ -20,7 +20,6 @@ const chartHeight = 60;
 const barshift = 60;
 let displayDay = 0;
 
-
 async function setup() {
 
     // resize();
