@@ -6,7 +6,7 @@ import { AutoComplete } from './assets/modules/Autocomplete';
 
 
 
-const grabber = new Grabber( true )
+const grabber = new Grabber( false )
 const parser = new Parser();
 const pageModifier = new PageModifier();
 const pageBuilder = new PageBuilder();
